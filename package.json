@@ -3,6 +3,7 @@
   "displayName": "coding-pet",
   "description": "Un animal de compagnie qui évolue avec vos habitudes de code",
   "version": "0.0.1",
+  "publisher": "Starland",
   "repository": {
     "type": "git",
     "url": "https://github.com/Starland9/coding-pet"
