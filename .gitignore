@@ -3,3 +3,4 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+coding-pet-0.0.1.vsix
