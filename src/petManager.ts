@@ -100,6 +100,8 @@ export class PetManager {
 
   public getPetStatusText(): string {
     const data = this.boy.getData();
-    return `${data.name} | Lvl ${data.level} | ❤️${data.happiness}% | ⚡${data.energy}% | 🍽️${data.hunger}%`;
+    return `${data.name} | Lvl ${data.level} | ❤️${Math.round(
+      data.happiness
+    )}% | ⚡${Math.round(data.energy)}% | 🍽️${Math.round(data.hunger)}%`;
   }
 }
