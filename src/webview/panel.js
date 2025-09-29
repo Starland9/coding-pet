@@ -17,8 +17,9 @@
   function updateUI(data) {
     // Mise à jour du titre avec le nom
     const titleElement = document.querySelector(".title-text");
-    if (titleElement)
+    if (titleElement) {
       titleElement.textContent = data.name || "Coding Companion";
+    }
 
     // Mise à jour du status
     updateStatus(data);
@@ -39,7 +40,9 @@
     const statusText = document.getElementById("statusText");
     const statusDot = document.querySelector(".status-dot");
 
-    if (!statusText || !statusDot) return;
+    if (!statusText || !statusDot) {
+      return;
+    }
 
     let status = "Active";
     let color = "#4ade80";
@@ -65,7 +68,9 @@
   function updateLevelDisplay(data) {
     // Mise à jour du numéro de niveau
     const levelNumber = document.getElementById("levelNumber");
-    if (levelNumber) levelNumber.textContent = data.level;
+    if (levelNumber) {
+      levelNumber.textContent = data.level;
+    }
 
     // Mise à jour du texte XP
     const xpText = document.getElementById("xpText");
@@ -78,7 +83,7 @@
     const xpProgress = document.getElementById("xpProgress");
     if (xpProgress) {
       const nextLevelXP = data.level * 100;
-      const percentage = (data.xp / nextLevelXP) * 100;
+      const percentage = Math.round((data.xp / nextLevelXP) * 100);
       xpProgress.style.width = `${percentage}%`;
     }
 
@@ -97,8 +102,12 @@
     const progressElement = document.getElementById(`${type}Progress`);
     const textElement = document.getElementById(`${type}Text`);
 
-    if (progressElement) progressElement.style.width = `${value}%`;
-    if (textElement) textElement.textContent = `${value}%`;
+    if (progressElement) {
+      progressElement.style.width = `${Math.round(value)}%`;
+    }
+    if (textElement) {
+      textElement.textContent = `${Math.round(value)}%`;
+    }
   }
 
   function updateSprite(animationState, currentSprite) {
@@ -124,15 +133,27 @@
   function updateStats(data) {
     // Mise à jour des barres de progression
     const progressBars = document.querySelectorAll(".progress");
-    if (progressBars[0]) progressBars[0].style.width = `${data.happiness}%`;
-    if (progressBars[1]) progressBars[1].style.width = `${data.energy}%`;
-    if (progressBars[2]) progressBars[2].style.width = `${data.hunger}%`;
+    if (progressBars[0]) {
+      progressBars[0].style.width = `${Math.round(data.happiness)}%`;
+    }
+    if (progressBars[1]) {
+      progressBars[1].style.width = `${Math.round(data.energy)}%`;
+    }
+    if (progressBars[2]) {
+      progressBars[2].style.width = `${Math.round(data.hunger)}%`;
+    }
 
     // Mise à jour des textes
     const statSpans = document.querySelectorAll(".stat-bar span:last-child");
-    if (statSpans[1]) statSpans[1].textContent = `${data.happiness}%`;
-    if (statSpans[2]) statSpans[2].textContent = `${data.energy}%`;
-    if (statSpans[3]) statSpans[3].textContent = `${data.hunger}%`;
+    if (statSpans[1]) {
+      statSpans[1].textContent = `${Math.round(data.happiness)}%`;
+    }
+    if (statSpans[2]) {
+      statSpans[2].textContent = `${Math.round(data.energy)}%`;
+    }
+    if (statSpans[3]) {
+      statSpans[3].textContent = `${Math.round(data.hunger)}%`;
+    }
 
     // Mise à jour du niveau
     const levelSpan = document.querySelector(".stat-bar span:first-child");
@@ -187,7 +208,9 @@
 
   function createActionParticles(action) {
     const container = document.querySelector(".sprite-container");
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     const colors = {
       feed: ["#fa709a", "#fee140"],
