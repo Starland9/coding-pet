@@ -1,19 +1,46 @@
 {
   "name": "coding-pet",
-  "displayName": "coding-pet",
-  "description": "Un animal de compagnie qui évolue avec vos habitudes de code",
-  "version": "0.0.1",
+  "displayName": "Coding Pet",
+  "description": "🤖 Your virtual coding companion that evolves with your programming habits! Features beautiful glassmorphism UI, XP system, and real-time reactions to your coding activity.",
+  "version": "0.0.3",
   "publisher": "Starland",
+  "author": {
+    "name": "Starland9",
+    "url": "https://github.com/Starland9"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Starland9/coding-pet#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/Starland9/coding-pet"
+  },
+  "bugs": {
+    "url": "https://github.com/Starland9/coding-pet/issues"
   },
   "engines": {
     "vscode": "^1.100.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Visualization"
   ],
+  "keywords": [
+    "pet",
+    "companion",
+    "gamification",
+    "productivity",
+    "fun",
+    "coding",
+    "tamagotchi",
+    "virtual pet",
+    "developer experience",
+    "motivation"
+  ],
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#667eea",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -22,13 +49,15 @@
     "commands": [
       {
         "command": "codingPet.showPet",
-        "title": "Voir mon Animal de Compagnie",
-        "category": "Coding Pet"
+        "title": "🤖 Show My Coding Pet",
+        "category": "Coding Pet",
+        "icon": "$(heart)"
       },
       {
         "command": "codingPet.feedPet",
-        "title": "Nourrir l'Animal",
-        "category": "Coding Pet"
+        "title": "🍎 Feed Pet",
+        "category": "Coding Pet",
+        "icon": "$(symbol-food)"
       }
     ],
     "viewsContainers": {
@@ -44,7 +73,7 @@
       "codingPet": [
         {
           "id": "petStatus",
-          "name": "Statut de l'Animal",
+          "name": "Pet Status",
           "when": "true",
           "type": "webview"
         }
