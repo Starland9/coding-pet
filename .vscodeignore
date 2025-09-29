@@ -1,3 +1,4 @@
+
 .vscode/**
 .vscode-test/**
 out/**
@@ -12,3 +13,9 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# --- INCLUSIONS POUR LA WEBVIEW ---
+!src/webview/panel.html
+!src/webview/panel.css
+!src/webview/panel.js
+!src/assets/images/sprites/boy/**
