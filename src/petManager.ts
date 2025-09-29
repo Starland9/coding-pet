@@ -5,6 +5,7 @@ export class PetManager {
   private context: vscode.ExtensionContext;
   private boy: Boy;
   private updateInterval: NodeJS.Timeout | undefined;
+  private codingTimeout: NodeJS.Timeout | undefined;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -36,8 +37,10 @@ export class PetManager {
   }
 
   public onCodeChange(): void {
+    console.log("PetManager: Code change detected");
     this.boy.addXP(1);
     this.boy.startCoding();
+    this.resetCodingTimeout();
     this.saveBoyData();
   }
 
@@ -63,7 +66,7 @@ export class PetManager {
 
   // Sauvegarde
   public saveBoyData(): void {
-    this.context.globalState.update("codingPet.bodData", this.boy.toJSON());
+    this.context.globalState.update("codingPet.boyData", this.boy.toJSON());
   }
 
   private startUpdateLoop(): void {
@@ -74,14 +77,29 @@ export class PetManager {
     }, 1000);
   }
 
+  private resetCodingTimeout(): void {
+    if (this.codingTimeout) {
+      clearTimeout(this.codingTimeout);
+    }
+
+    this.codingTimeout = setTimeout(() => {
+      console.log("PetManager: Coding timeout - stopping coding mode");
+      this.boy.stopCoding();
+      this.saveBoyData();
+    }, 10000); // 10 secondes sans changement = arrêt du mode coding
+  }
+
   public dispose() {
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
+    }
+    if (this.codingTimeout) {
+      clearTimeout(this.codingTimeout);
     }
   }
 
   public getPetStatusText(): string {
     const data = this.boy.getData();
-    return `${data.name} | Lvl ${data.level} | ❤️${data.happyness}% | ⚡${data.energy}% | 🍽️${data.hunger}%`;
+    return `${data.name} | Lvl ${data.level} | ❤️${data.happiness}% | ⚡${data.energy}% | 🍽️${data.hunger}%`;
   }
 }

@@ -4,52 +4,186 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Coding Pet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="STYLE_URI_PLACEHOLDER" />
   </head>
   <body>
+    <div class="background-effects">
+      <div class="floating-particles"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
     <div class="container">
-      <h1 id="petName">Mon Animal</h1>
+      <!-- Header avec titre stylé -->
+      <header class="pet-header">
+        <div class="header-glow"></div>
+        <h1 id="petName" class="pet-title">
+          <span class="title-icon">🤖</span>
+          <span class="title-text">Coding Companion</span>
+        </h1>
+        <div class="status-indicator" id="statusIndicator">
+          <div class="status-dot"></div>
+          <span id="statusText">Active</span>
+        </div>
+      </header>
 
-      <div class="sprite-container">
-        <div id="petSprite" class="sprite"></div>
+      <!-- Container du pet avec effets avancés -->
+      <div class="pet-stage">
+        <div class="stage-background">
+          <div class="stage-grid"></div>
+          <div class="stage-glow"></div>
+        </div>
+
+        <div class="sprite-container">
+          <div class="sprite-frame">
+            <div id="petSprite" class="sprite"></div>
+            <div class="sprite-reflection"></div>
+          </div>
+          <div class="interaction-ripple" id="interactionRipple"></div>
+        </div>
+
+        <!-- Particules d'ambiance -->
+        <div class="ambient-particles">
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+        </div>
       </div>
 
-      <div class="stats">
-        <div class="stat-bar">
-          <span id="levelInfo">Level 1 (XP: 0)</span>
+      <!-- Panel des statistiques redesigné -->
+      <section class="stats-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span class="title-icon">📊</span>
+            Vital Signs
+          </h2>
         </div>
-        <div class="stat-bar">
-          <span>❤️ Bonheur</span>
-          <div class="progress-bar">
-            <div
-              id="happinessProgress"
-              class="progress"
-              style="width: 50%"
-            ></div>
-          </div>
-          <span id="happinessText">50%</span>
-        </div>
-        <div class="stat-bar">
-          <span>⚡ Énergie</span>
-          <div class="progress-bar">
-            <div id="energyProgress" class="progress" style="width: 100%"></div>
-          </div>
-          <span id="energyText">100%</span>
-        </div>
-        <div class="stat-bar">
-          <span>🍽️ Faim</span>
-          <div class="progress-bar">
-            <div id="hungerProgress" class="progress" style="width: 50%"></div>
-          </div>
-          <span id="hungerText">50%</span>
-        </div>
-      </div>
 
-      <div class="actions">
-        <button onclick="feedPet()">🍎 Nourrir</button>
-        <button onclick="playWithPet()">🎮 Jouer</button>
-        <button onclick="letPetRest()">😴 Repos</button>
-      </div>
+        <!-- Level display premium -->
+        <div class="level-display">
+          <div class="level-ring">
+            <svg class="level-progress" width="60" height="60">
+              <circle
+                cx="30"
+                cy="30"
+                r="25"
+                fill="none"
+                stroke="var(--vscode-charts-blue)"
+                stroke-width="3"
+                opacity="0.2"
+              />
+              <circle
+                id="levelCircle"
+                cx="30"
+                cy="30"
+                r="25"
+                fill="none"
+                stroke="var(--vscode-charts-blue)"
+                stroke-width="3"
+                stroke-dasharray="157"
+                stroke-dashoffset="78.5"
+                transform="rotate(-90 30 30)"
+              />
+            </svg>
+            <div class="level-content">
+              <span id="levelNumber" class="level-number">1</span>
+              <span class="level-label">LVL</span>
+            </div>
+          </div>
+          <div class="xp-info">
+            <span id="xpText" class="xp-text">0 XP</span>
+            <div class="xp-bar">
+              <div id="xpProgress" class="xp-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats avec design moderne -->
+        <div class="stats-grid">
+          <div class="stat-card" data-stat="happiness">
+            <div class="stat-icon">💖</div>
+            <div class="stat-content">
+              <label class="stat-label">Happiness</label>
+              <div class="stat-bar">
+                <div
+                  id="happinessProgress"
+                  class="stat-fill happiness"
+                  style="width: 50%"
+                ></div>
+                <span class="stat-glow happiness"></span>
+              </div>
+              <span id="happinessText" class="stat-value">50%</span>
+            </div>
+          </div>
+
+          <div class="stat-card" data-stat="energy">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-content">
+              <label class="stat-label">Energy</label>
+              <div class="stat-bar">
+                <div
+                  id="energyProgress"
+                  class="stat-fill energy"
+                  style="width: 100%"
+                ></div>
+                <span class="stat-glow energy"></span>
+              </div>
+              <span id="energyText" class="stat-value">100%</span>
+            </div>
+          </div>
+
+          <div class="stat-card" data-stat="hunger">
+            <div class="stat-icon">�</div>
+            <div class="stat-content">
+              <label class="stat-label">Hunger</label>
+              <div class="stat-bar">
+                <div
+                  id="hungerProgress"
+                  class="stat-fill hunger"
+                  style="width: 50%"
+                ></div>
+                <span class="stat-glow hunger"></span>
+              </div>
+              <span id="hungerText" class="stat-value">50%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Actions avec design premium -->
+      <section class="actions-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <span class="title-icon">🎮</span>
+            Actions
+          </h2>
+        </div>
+
+        <div class="action-grid">
+          <button class="action-btn feed" onclick="feedPet()">
+            <div class="btn-icon">🍎</div>
+            <span class="btn-text">Feed</span>
+            <div class="btn-ripple"></div>
+          </button>
+
+          <button class="action-btn play" onclick="playWithPet()">
+            <div class="btn-icon">🎮</div>
+            <span class="btn-text">Play</span>
+            <div class="btn-ripple"></div>
+          </button>
+
+          <button class="action-btn rest" onclick="letPetRest()">
+            <div class="btn-icon">😴</div>
+            <span class="btn-text">Rest</span>
+            <div class="btn-ripple"></div>
+          </button>
+        </div>
+      </section>
     </div>
 
     <!-- Configuration injectée par l'extension -->

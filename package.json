@@ -45,7 +45,17 @@
         {
           "id": "petStatus",
           "name": "Statut de l'Animal",
-          "when": "true"
+          "when": "true",
+          "type": "webview"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "codingPet.feedPet",
+          "when": "view == petStatus",
+          "group": "navigation"
         }
       ]
     }

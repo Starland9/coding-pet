@@ -2,13 +2,14 @@ export interface BoyData {
   name: string;
   level: number;
   xp: number;
-  happyness: number;
+  happiness: number;
   energy: number;
   hunger: number;
   currentSprite: string;
   animationState: "idle" | "happy" | "coding" | "sleeping" | "eating";
   currentFrame: number;
   lastUpdate: number;
+  isCoding: boolean;
 }
 
 export class Boy {
@@ -19,13 +20,14 @@ export class Boy {
       name: data?.name || "Coding Boy",
       level: data?.level || 1,
       xp: data?.xp || 0,
-      happyness: data?.happyness || 50,
+      happiness: data?.happiness || 50,
       energy: data?.energy || 100,
       hunger: data?.hunger || 50,
       currentSprite: data?.currentSprite || "1",
       animationState: data?.animationState || "idle",
       currentFrame: data?.currentFrame || 0,
       lastUpdate: data?.lastUpdate || Date.now(),
+      isCoding: data?.isCoding || false,
     };
   }
 
@@ -45,8 +47,8 @@ export class Boy {
     return this.data.xp;
   }
 
-  public getHappyness(): number {
-    return this.data.happyness;
+  public getHappiness(): number {
+    return this.data.happiness;
   }
 
   public getEnergy(): number {
@@ -72,13 +74,13 @@ export class Boy {
   }
 
   public feed(): void {
-    this.data.hunger = Math.max(100, this.data.hunger + 30);
-    this.data.happyness = Math.min(100, this.data.happyness + 10);
+    this.data.hunger = Math.min(100, this.data.hunger + 30);
+    this.data.happiness = Math.min(100, this.data.happiness + 10);
     this.setTemporaryState("eating", 3000);
   }
 
   public play(): void {
-    this.data.happyness = Math.min(100, this.data.happyness + 20);
+    this.data.happiness = Math.min(100, this.data.happiness + 20);
     this.data.energy = Math.max(0, this.data.energy - 10);
     this.setTemporaryState("happy", 3000);
   }
@@ -89,10 +91,14 @@ export class Boy {
   }
 
   public startCoding(): void {
-    this.setTemporaryState("coding", 0);
+    console.log("Boy: Starting coding mode");
+    this.data.isCoding = true;
+    this.data.animationState = "coding";
   }
 
   public stopCoding(): void {
+    console.log("Boy: Stopping coding mode");
+    this.data.isCoding = false;
     this.updateAnimationState();
   }
 
@@ -107,7 +113,7 @@ export class Boy {
 
     // Dégrader le bonheur si faim ou énergie basse
     if (this.data.hunger < 20 || this.data.energy < 20) {
-      this.data.happyness = Math.max(0, this.data.happyness - minutes * 5);
+      this.data.happiness = Math.max(0, this.data.happiness - minutes * 5);
     }
 
     this.data.lastUpdate = now;
@@ -119,16 +125,22 @@ export class Boy {
     if (this.data.xp >= xpForNextLevel) {
       this.data.level++;
       this.data.xp -= xpForNextLevel;
-      this.data.happyness = Math.min(100, this.data.happyness + 20);
+      this.data.happiness = Math.min(100, this.data.happiness + 20);
     }
   }
 
   private updateAnimationState(): void {
+    // Ne pas changer l'état si on est en train de coder
+    if (this.data.isCoding) {
+      this.data.animationState = "coding";
+      return;
+    }
+
     if (this.data.energy < 30) {
       this.data.animationState = "sleeping";
     } else if (this.data.hunger < 20) {
       this.data.animationState = "eating";
-    } else if (this.data.happyness > 80) {
+    } else if (this.data.happiness > 80) {
       this.data.animationState = "happy";
     } else {
       this.data.animationState = "idle";

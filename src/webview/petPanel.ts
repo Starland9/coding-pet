@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
-import * as path from "path";
 import { PetManager } from "../petManager";
+import { PetWebview } from "./petWebview";
 
 export class PetPanel {
   public static currentPanel: PetPanel | undefined;
@@ -9,6 +8,7 @@ export class PetPanel {
 
   private readonly panel: vscode.WebviewPanel;
   private readonly extensionUri: vscode.Uri;
+  private readonly petWebview: PetWebview;
   private disposables: vscode.Disposable[] = [];
 
   public static createOrShow(extensionUri: vscode.Uri, petManager: PetManager) {
@@ -46,96 +46,37 @@ export class PetPanel {
     this.panel = panel;
     this.extensionUri = extensionUri;
 
+    // Initialiser le webview
+    this.petWebview = new PetWebview(
+      this.panel.webview,
+      extensionUri,
+      petManager
+    );
+
+    // Valider les ressources au démarrage
+    const validation = this.petWebview.validateResources();
+    if (!validation.valid) {
+      console.error("PetPanel: Missing resources:", validation.errors);
+    }
+
     this.update();
 
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
+    // Déléguer les messages au PetWebview
     this.panel.webview.onDidReceiveMessage(
-      (message) => {
-        switch (message.command) {
-          case "feedPet":
-            this.petManager.feedPet();
-            this.sendUpdateToPet("feed");
-            break;
-          case "playWithPet":
-            this.petManager.playWithPet();
-            this.sendUpdateToPet("play");
-            break;
-          case "letPetRest":
-            this.petManager.letPetRest();
-            this.sendUpdateToPet("rest");
-            break;
-        }
-      },
+      (message) => this.petWebview.handleMessage(message),
       null,
       this.disposables
     );
   }
 
   private update() {
-    this.panel.webview.html = this.getWebviewContent();
+    this.panel.webview.html = this.petWebview.getHtmlContent();
   }
 
-  private sendUpdateToPet(action?: string) {
-    const petData = this.petManager.getPetData();
-    this.panel.webview.postMessage({
-      type: "updatePet",
-      data: petData,
-    });
-
-    if (action) {
-      this.panel.webview.postMessage({
-        type: "petAction",
-        action: action,
-      });
-    }
-  }
-
-  private getWebviewContent(): string {
-    const petData = this.petManager.getPetData();
-
-    // Lire le template HTML
-    const htmlPath = path.join(
-      this.extensionUri.fsPath,
-      "src",
-      "webview",
-      "panel.html"
-    );
-    let htmlContent = fs.readFileSync(htmlPath, "utf8");
-
-    // Créer les URIs pour les ressources
-    const styleUri = this.panel.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "src", "webview", "panel.css")
-    );
-    const scriptUri = this.panel.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "src", "webview", "panel.js")
-    );
-    const spritesUri = this.panel.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.extensionUri,
-        "src",
-        "assets",
-        "images",
-        "sprites",
-        "boy"
-      )
-    );
-
-    // Configuration JavaScript à injecter
-    const configScript = `
-    window.PET_CONFIG = {
-      petData: ${JSON.stringify(petData)},
-      spritesUri: '${spritesUri.toString()}'
-    };
-  `;
-
-    // Remplacer les placeholders
-    htmlContent = htmlContent
-      .replace("STYLE_URI_PLACEHOLDER", styleUri.toString())
-      .replace("SCRIPT_URI_PLACEHOLDER", scriptUri.toString())
-      .replace("// Sera remplacé par l'extension", configScript);
-
-    return htmlContent;
+  public sendUpdateToPet(action?: string) {
+    this.petWebview.updatePetData(action);
   }
 
   public dispose() {
