@@ -20,18 +20,18 @@ export function activate(context: vscode.ExtensionContext) {
   // Surveiller les changements de fichiers
   const onDocumentChange = vscode.workspace.onDidChangeTextDocument((event) => {
     if (event.contentChanges.length > 0) {
-      petManager.onCodeWritten(event.contentChanges.length);
+      petManager.onCodeChange();
     }
   });
 
   // Surveiller les sauvegardes
   const onDocumentSave = vscode.workspace.onDidSaveTextDocument(() => {
-    petManager.onFileSaved();
+    petManager.onFileChange();
   });
 
   // Surveiller l'ouverture de fichiers
   const onDocumentOpen = vscode.workspace.onDidOpenTextDocument(() => {
-    petManager.onFileOpened();
+    petManager.onFileOpen();
   });
 
   // Status bar item
@@ -43,11 +43,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Mettre à jour le status bar
   const updateStatusBar = () => {
-    const pet = petManager.getPetData();
-    statusBarItem.text = `$(heart) ${pet.evolution} Niv.${pet.level}`;
-    statusBarItem.tooltip = `Santé: ${pet.health}% | Bonheur: ${Math.round(
-      pet.happiness
-    )}%`;
+    statusBarItem.text = petManager.getPetStatusText();
+
     statusBarItem.show();
   };
 

@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import * as fs from "fs";
+import * as path from "path";
 import { PetManager } from "../petManager";
 
 export class PetPanel {
@@ -16,6 +18,7 @@ export class PetPanel {
 
     if (PetPanel.currentPanel) {
       PetPanel.currentPanel.panel.reveal(column);
+      PetPanel.currentPanel.update();
       return;
     }
 
@@ -25,7 +28,10 @@ export class PetPanel {
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri, "media")],
+        localResourceRoots: [
+          vscode.Uri.joinPath(extensionUri, "src", "webview"),
+          vscode.Uri.joinPath(extensionUri, "src", "assets"),
+        ],
       }
     );
 
@@ -49,173 +55,87 @@ export class PetPanel {
         switch (message.command) {
           case "feedPet":
             this.petManager.feedPet();
-            this.update();
-            return;
-          case "fixBug":
-            this.petManager.onBugFixed();
-            this.update();
-            return;
+            this.sendUpdateToPet("feed");
+            break;
+          case "playWithPet":
+            this.petManager.playWithPet();
+            this.sendUpdateToPet("play");
+            break;
+          case "letPetRest":
+            this.petManager.letPetRest();
+            this.sendUpdateToPet("rest");
+            break;
         }
       },
       null,
       this.disposables
     );
-
-    // Écouter les mises à jour du pet
-    this.petManager.onPetUpdate(() => {
-      this.update();
-    });
   }
 
   private update() {
+    this.panel.webview.html = this.getWebviewContent();
+  }
+
+  private sendUpdateToPet(action?: string) {
     const petData = this.petManager.getPetData();
-    this.panel.webview.html = this.getHtmlForWebview(petData);
+    this.panel.webview.postMessage({
+      type: "updatePet",
+      data: petData,
+    });
+
+    if (action) {
+      this.panel.webview.postMessage({
+        type: "petAction",
+        action: action,
+      });
+    }
   }
 
-  private getHtmlForWebview(petData: any) {
-    // Utiliser le code React/HTML de l'artifact précédent
-    // mais adapté pour VS Code webview
-    return `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Mon Animal de Compagnie</title>
-            <style>
-                body { 
-                    font-family: var(--vscode-font-family);
-                    color: var(--vscode-foreground);
-                    background: var(--vscode-editor-background);
-                    padding: 20px;
-                    margin: 0;
-                }
-                .pet-container {
-                    max-width: 600px;
-                    margin: 0 auto;
-                    background: var(--vscode-editor-background);
-                    padding: 20px;
-                    border-radius: 8px;
-                }
-                .pet-display {
-                    text-align: center;
-                    margin-bottom: 20px;
-                }
-                .pet-emoji {
-                    font-size: 60px;
-                    margin-bottom: 10px;
-                }
-                .stat-bar {
-                    background: var(--vscode-input-background);
-                    height: 20px;
-                    border-radius: 10px;
-                    overflow: hidden;
-                    margin: 5px 0;
-                }
-                .stat-fill {
-                    height: 100%;
-                    transition: width 0.3s ease;
-                }
-                .health { background-color: #ff6b6b; }
-                .energy { background-color: #ffd93d; }
-                .happiness { background-color: #6bcf7f; }
-                .actions {
-                    display: flex;
-                    gap: 10px;
-                    justify-content: center;
-                    margin-top: 20px;
-                }
-                button {
-                    background: var(--vscode-button-background);
-                    color: var(--vscode-button-foreground);
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-                button:hover {
-                    background: var(--vscode-button-hoverBackground);
-                }
-            </style>
-        </head>
-        <body>
-            <div class="pet-container">
-                <div class="pet-display">
-                    <div class="pet-emoji">${this.getEmojiForEvolution(
-                      petData.evolution
-                    )}</div>
-                    <h2>${petData.name} - Niveau ${petData.level}</h2>
-                    <p>Évolution: ${petData.evolution} | Humeur: ${
-      petData.mood
-    }</p>
-                </div>
-                
-                <div class="stats">
-                    <div>
-                        <label>Santé: ${petData.health}%</label>
-                        <div class="stat-bar">
-                            <div class="stat-fill health" style="width: ${
-                              petData.health
-                            }%"></div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label>Énergie: ${petData.energy}%</label>
-                        <div class="stat-bar">
-                            <div class="stat-fill energy" style="width: ${
-                              petData.energy
-                            }%"></div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label>Bonheur: ${Math.round(
-                          petData.happiness
-                        )}%</label>
-                        <div class="stat-bar">
-                            <div class="stat-fill happiness" style="width: ${
-                              petData.happiness
-                            }%"></div>
-                        </div>
-                    </div>
-                </div>
+  private getWebviewContent(): string {
+    const petData = this.petManager.getPetData();
 
-                <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                    <div>
-                        <h3>Statistiques</h3>
-                        <p>Lignes de code: ${petData.stats.linesOfCode}</p>
-                        <p>Bugs corrigés: ${petData.stats.bugsFixed}</p>
-                        <p>Fichiers sauvés: ${petData.stats.filesSaved}</p>
-                        <p>XP Total: ${petData.xp}</p>
-                    </div>
-                </div>
+    // Lire le template HTML
+    const htmlPath = path.join(
+      this.extensionUri.fsPath,
+      "src",
+      "webview",
+      "panel.html"
+    );
+    let htmlContent = fs.readFileSync(htmlPath, "utf8");
 
-                <div class="actions">
-                    <button onclick="sendMessage('feedPet')">🍖 Nourrir</button>
-                    <button onclick="sendMessage('fixBug')">🐛 Corriger un Bug</button>
-                </div>
-            </div>
+    // Créer les URIs pour les ressources
+    const styleUri = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, "src", "webview", "panel.css")
+    );
+    const scriptUri = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, "src", "webview", "panel.js")
+    );
+    const spritesUri = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.extensionUri,
+        "src",
+        "assets",
+        "images",
+        "sprites",
+        "boy"
+      )
+    );
 
-            <script>
-                const vscode = acquireVsCodeApi();
-                
-                function sendMessage(command) {
-                    vscode.postMessage({ command: command });
-                }
-            </script>
-        </body>
-        </html>`;
-  }
-
-  private getEmojiForEvolution(evolution: string): string {
-    const emojis: { [key: string]: string } = {
-      chaton: "🐱",
-      chat: "😺",
-      lynx: "🐱‍💻",
-      tigre: "🐅",
-      dragon: "🐲",
+    // Configuration JavaScript à injecter
+    const configScript = `
+    window.PET_CONFIG = {
+      petData: ${JSON.stringify(petData)},
+      spritesUri: '${spritesUri.toString()}'
     };
-    return emojis[evolution] || "🐱";
+  `;
+
+    // Remplacer les placeholders
+    htmlContent = htmlContent
+      .replace("STYLE_URI_PLACEHOLDER", styleUri.toString())
+      .replace("SCRIPT_URI_PLACEHOLDER", scriptUri.toString())
+      .replace("// Sera remplacé par l'extension", configScript);
+
+    return htmlContent;
   }
 
   public dispose() {

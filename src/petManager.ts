@@ -1,167 +1,87 @@
 import * as vscode from "vscode";
-
-export interface PetData {
-  name: string;
-  level: number;
-  xp: number;
-  health: number;
-  happiness: number;
-  energy: number;
-  mood: string;
-  evolution: string;
-  stats: {
-    linesOfCode: number;
-    bugsFixed: number;
-    filesSaved: number;
-    sessionsCount: number;
-    lastActive: number;
-  };
-}
+import { Boy, BoyData } from "./models/Boy";
 
 export class PetManager {
   private context: vscode.ExtensionContext;
-  private petData: PetData;
-  private onPetUpdateEmitter = new vscode.EventEmitter<PetData>();
-  public readonly onPetUpdate = this.onPetUpdateEmitter.event;
+  private boy: Boy;
+  private updateInterval: NodeJS.Timeout | undefined;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.petData = this.loadPetData();
-
-    // Dégrader progressivement les stats
-    setInterval(() => {
-      this.degradeStats();
-    }, 60000); // Chaque minute
+    this.boy = this.loadBoyData();
+    this.startUpdateLoop();
   }
 
-  private loadPetData(): PetData {
-    const saved = this.context.globalState.get<PetData>("petData");
-    if (saved) {
-      return saved;
+  public getPetData() {
+    return this.boy.getData();
+  }
+
+  public getBoy(): Boy {
+    return this.boy;
+  }
+
+  public feedPet(): void {
+    this.boy.feed();
+    this.saveBoyData();
+  }
+
+  public playWithPet(): void {
+    this.boy.play();
+    this.saveBoyData();
+  }
+
+  public letPetRest(): void {
+    this.boy.rest();
+    this.saveBoyData();
+  }
+
+  public onCodeChange(): void {
+    this.boy.addXP(1);
+    this.boy.startCoding();
+    this.saveBoyData();
+  }
+
+  public onFileChange(): void {
+    this.boy.addXP(5);
+    this.saveBoyData();
+  }
+
+  public onFileOpen(): void {
+    this.boy.addXP(2);
+    this.saveBoyData();
+  }
+
+  // Persistance
+  private loadBoyData(): Boy {
+    const savedData =
+      this.context.globalState.get<BoyData>("codingPet.boyData");
+    if (savedData) {
+      return Boy.fromJSON(savedData);
     }
-
-    return {
-      name: "CodeCat",
-      level: 1,
-      xp: 0,
-      health: 100,
-      happiness: 80,
-      energy: 90,
-      mood: "content",
-      evolution: "chaton",
-      stats: {
-        linesOfCode: 0,
-        bugsFixed: 0,
-        filesSaved: 0,
-        sessionsCount: 1,
-        lastActive: Date.now(),
-      },
-    };
+    return new Boy();
   }
 
-  private savePetData() {
-    this.context.globalState.update("petData", this.petData);
-    this.onPetUpdateEmitter.fire(this.petData);
+  // Sauvegarde
+  public saveBoyData(): void {
+    this.context.globalState.update("codingPet.bodData", this.boy.toJSON());
   }
 
-  public onCodeWritten(changes: number) {
-    this.petData.stats.linesOfCode += changes;
-    this.addXP(changes * 2);
-    this.petData.happiness = Math.min(100, this.petData.happiness + 1);
-    this.petData.stats.lastActive = Date.now();
-    this.updateEvolution();
-    this.savePetData();
-  }
-
-  public onFileSaved() {
-    this.petData.stats.filesSaved++;
-    this.addXP(10);
-    this.petData.happiness = Math.min(100, this.petData.happiness + 5);
-    this.savePetData();
-  }
-
-  public onFileOpened() {
-    this.petData.energy = Math.max(0, this.petData.energy - 1);
-    this.savePetData();
-  }
-
-  public onBugFixed() {
-    this.petData.stats.bugsFixed++;
-    this.addXP(15);
-    this.petData.happiness = Math.max(0, this.petData.happiness - 2);
-    this.savePetData();
-  }
-
-  private addXP(amount: number) {
-    this.petData.xp += amount;
-    const newLevel = Math.floor(this.petData.xp / 100) + 1;
-
-    if (newLevel > this.petData.level) {
-      this.petData.level = newLevel;
-      this.petData.health = Math.min(100, this.petData.health + 20);
-      vscode.window.showInformationMessage(
-        `🎉 Votre animal a atteint le niveau ${newLevel}!`
-      );
-    }
-  }
-
-  private updateEvolution() {
-    const evolutions = {
-      chaton: { minLevel: 1 },
-      chat: { minLevel: 5 },
-      lynx: { minLevel: 10 },
-      tigre: { minLevel: 15 },
-      dragon: { minLevel: 20 },
-    };
-
-    for (const [evolution, data] of Object.entries(evolutions).reverse()) {
-      if (this.petData.level >= data.minLevel) {
-        if (this.petData.evolution !== evolution) {
-          this.petData.evolution = evolution;
-          vscode.window.showInformationMessage(
-            `🔥 Votre animal a évolué en ${evolution}!`
-          );
-        }
-        break;
-      }
-    }
-  }
-
-  private degradeStats() {
-    const now = Date.now();
-    const timeSinceActive = now - this.petData.stats.lastActive;
-
-    // Si inactif depuis plus de 30 minutes
-    if (timeSinceActive > 30 * 60 * 1000) {
-      this.petData.happiness = Math.max(0, this.petData.happiness - 2);
-      this.petData.energy = Math.max(0, this.petData.energy - 1);
-    }
-
-    // Mise à jour de l'humeur
-    if (this.petData.energy < 30) {
-      this.petData.mood = "fatigué";
-    } else if (this.petData.happiness > 90) {
-      this.petData.mood = "euphorique";
-    } else if (this.petData.happiness < 40) {
-      this.petData.mood = "frustré";
-    } else {
-      this.petData.mood = "content";
-    }
-
-    this.savePetData();
-  }
-
-  public getPetData(): PetData {
-    return { ...this.petData };
-  }
-
-  public feedPet() {
-    this.petData.happiness = Math.min(100, this.petData.happiness + 20);
-    this.petData.energy = Math.min(100, this.petData.energy + 15);
-    this.savePetData();
+  private startUpdateLoop(): void {
+    this.updateInterval = setInterval(() => {
+      this.boy.update();
+      this.boy.nextFrame();
+      this.saveBoyData();
+    }, 1000);
   }
 
   public dispose() {
-    this.onPetUpdateEmitter.dispose();
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+  }
+
+  public getPetStatusText(): string {
+    const data = this.boy.getData();
+    return `${data.name} | Lvl ${data.level} | ❤️${data.happyness}% | ⚡${data.energy}% | 🍽️${data.hunger}%`;
   }
 }

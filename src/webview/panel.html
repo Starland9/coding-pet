@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coding Pet</title>
+    <link rel="stylesheet" href="STYLE_URI_PLACEHOLDER" />
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="petName">Mon Animal</h1>
+
+      <div class="sprite-container">
+        <div id="petSprite" class="sprite"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-bar">
+          <span id="levelInfo">Level 1 (XP: 0)</span>
+        </div>
+        <div class="stat-bar">
+          <span>❤️ Bonheur</span>
+          <div class="progress-bar">
+            <div
+              id="happinessProgress"
+              class="progress"
+              style="width: 50%"
+            ></div>
+          </div>
+          <span id="happinessText">50%</span>
+        </div>
+        <div class="stat-bar">
+          <span>⚡ Énergie</span>
+          <div class="progress-bar">
+            <div id="energyProgress" class="progress" style="width: 100%"></div>
+          </div>
+          <span id="energyText">100%</span>
+        </div>
+        <div class="stat-bar">
+          <span>🍽️ Faim</span>
+          <div class="progress-bar">
+            <div id="hungerProgress" class="progress" style="width: 50%"></div>
+          </div>
+          <span id="hungerText">50%</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button onclick="feedPet()">🍎 Nourrir</button>
+        <button onclick="playWithPet()">🎮 Jouer</button>
+        <button onclick="letPetRest()">😴 Repos</button>
+      </div>
+    </div>
+
+    <!-- Configuration injectée par l'extension -->
+    <script id="configScript">
+      // Sera remplacé par l'extension
+    </script>
+    <script src="SCRIPT_URI_PLACEHOLDER"></script>
+  </body>
+</html>

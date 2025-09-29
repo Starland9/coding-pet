@@ -1,0 +1,171 @@
+body {
+  font-family: var(--vscode-font-family);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-editor-background);
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+h1 {
+  color: var(--vscode-textLink-foreground);
+  margin-bottom: 20px;
+}
+
+.sprite-container {
+  width: 120px;
+  height: 120px;
+  margin: 20px auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--vscode-editor-selectionBackground);
+  border-radius: 10px;
+  border: 2px solid var(--vscode-textLink-foreground);
+}
+
+.sprite {
+  width: 100px;
+  height: 100px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  transition: transform 0.2s ease;
+}
+
+.sprite.coding {
+  animation: bounce 1.5s infinite;
+}
+
+.sprite.happy {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+.sprite.eating {
+  animation: shake 0.5s infinite;
+}
+
+.sprite.sleeping {
+  opacity: 0.7;
+  animation: breathe 3s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+
+.stats {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.stat-bar {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+.stat-bar span:first-child {
+  min-width: 80px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.progress-bar {
+  flex: 1;
+  height: 20px;
+  background-color: var(--vscode-progressBar-background);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: var(--vscode-progressBar-background);
+  transition: width 0.3s ease;
+  border-radius: 10px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+button:active {
+  transform: scale(0.98);
+}
