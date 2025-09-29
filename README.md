@@ -1,6 +1,6 @@
 # 🤖 Coding Pet - Votre Compagnon de Codage Virtuel
 
-[![English](https://img.shields.io/badge/Lang-English-blue)](#english) [![Français](https://img.shields.io/badg4. Make your changes and submit a PR
+[![English](https://img.shields.io/badge/Lang-English-blue)](#english) ![Français](https://img.shields.io/badge/Lang-French-Blue)
 
 ## 📄 License
 
