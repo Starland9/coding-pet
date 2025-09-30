@@ -74,19 +74,19 @@ export class Boy {
   }
 
   public feed(): void {
-    this.data.hunger = Math.min(100, this.data.hunger + 30);
-    this.data.happiness = Math.min(100, this.data.happiness + 10);
+    this.data.hunger = Math.round(Math.min(100, this.data.hunger + 30));
+    this.data.happiness = Math.round(Math.min(100, this.data.happiness + 10));
     this.setTemporaryState("eating", 3000);
   }
 
   public play(): void {
-    this.data.happiness = Math.min(100, this.data.happiness + 20);
-    this.data.energy = Math.max(0, this.data.energy - 10);
+    this.data.happiness = Math.round(Math.min(100, this.data.happiness + 20));
+    this.data.energy = Math.round(Math.max(0, this.data.energy - 10));
     this.setTemporaryState("happy", 3000);
   }
 
   public rest(): void {
-    this.data.energy = Math.min(100, this.data.energy + 40);
+    this.data.energy = Math.round(Math.min(100, this.data.energy + 40));
     this.setTemporaryState("sleeping", 5000);
   }
 
@@ -107,13 +107,15 @@ export class Boy {
     const timeDiff = now - this.data.lastUpdate;
     const minutes = timeDiff / (1000 * 60); // Convertir en minutes
 
-    // Dégrader la faim et l'énergie
-    this.data.hunger = Math.max(0, this.data.hunger - minutes * 2);
-    this.data.energy = Math.max(0, this.data.energy - minutes * 1);
+    // Dégrader la faim et l'énergie (arrondir pour éviter les décimales)
+    this.data.hunger = Math.round(Math.max(0, this.data.hunger - minutes * 2));
+    this.data.energy = Math.round(Math.max(0, this.data.energy - minutes * 1));
 
     // Dégrader le bonheur si faim ou énergie basse
     if (this.data.hunger < 20 || this.data.energy < 20) {
-      this.data.happiness = Math.max(0, this.data.happiness - minutes * 5);
+      this.data.happiness = Math.round(
+        Math.max(0, this.data.happiness - minutes * 5)
+      );
     }
 
     this.data.lastUpdate = now;
@@ -125,7 +127,7 @@ export class Boy {
     if (this.data.xp >= xpForNextLevel) {
       this.data.level++;
       this.data.xp -= xpForNextLevel;
-      this.data.happiness = Math.min(100, this.data.happiness + 20);
+      this.data.happiness = Math.round(Math.min(100, this.data.happiness + 20));
     }
   }
 

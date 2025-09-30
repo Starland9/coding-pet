@@ -59,9 +59,29 @@ export class PetManager {
     const savedData =
       this.context.globalState.get<BoyData>("codingPet.boyData");
     if (savedData) {
-      return Boy.fromJSON(savedData);
+      // Migration automatique : arrondir les anciennes données avec décimales
+      const migratedData = this.migrateLegacyData(savedData);
+      const boy = Boy.fromJSON(migratedData);
+      // Sauvegarder immédiatement les données migrées
+      this.context.globalState.update("codingPet.boyData", boy.toJSON());
+      return boy;
     }
     return new Boy();
+  }
+
+  /**
+   * Migration des anciennes données avec décimales vers entiers
+   */
+  private migrateLegacyData(data: BoyData): BoyData {
+    return {
+      ...data,
+      happiness: Math.round(data.happiness),
+      energy: Math.round(data.energy),
+      hunger: Math.round(data.hunger),
+      // S'assurer que les autres valeurs numériques sont aussi propres
+      level: Math.round(data.level),
+      xp: Math.round(data.xp),
+    };
   }
 
   // Sauvegarde

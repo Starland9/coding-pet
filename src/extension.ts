@@ -39,6 +39,24 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Commande pour réinitialiser le pet (au cas où)
+  const resetPetCommand = vscode.commands.registerCommand(
+    "codingPet.resetPet",
+    async () => {
+      const choice = await vscode.window.showWarningMessage(
+        "Réinitialiser votre pet ? Toute progression sera perdue.",
+        "Oui",
+        "Non"
+      );
+      if (choice === "Oui") {
+        await context.globalState.update("codingPet.boyData", undefined);
+        vscode.window.showInformationMessage(
+          "Pet réinitialisé ! Rechargez la fenêtre."
+        );
+      }
+    }
+  );
+
   // Surveiller les changements de fichiers
   const onDocumentChange = vscode.workspace.onDidChangeTextDocument((event) => {
     // Filtrer les fichiers de code seulement
@@ -97,6 +115,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     showPetCommand,
     feedPetCommand,
+    resetPetCommand,
     onDocumentChange,
     onDocumentSave,
     onDocumentOpen,
