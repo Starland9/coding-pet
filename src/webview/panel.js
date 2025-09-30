@@ -172,11 +172,7 @@
         case "updatePet":
           console.log("JS: Updating pet data", message.data);
           currentPetData = message.data;
-          updateSprite(
-            currentPetData.animationState,
-            currentPetData.currentSprite
-          );
-          updateStats(currentPetData);
+          updateUI(currentPetData);
           break;
         case "petAction":
           console.log("JS: Pet action", message.action);

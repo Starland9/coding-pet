@@ -82,14 +82,17 @@ export function activate(context: vscode.ExtensionContext) {
   // Mettre à jour le status bar
   const updateStatusBar = () => {
     statusBarItem.text = petManager.getPetStatusText();
-
     statusBarItem.show();
   };
 
   updateStatusBar();
 
-  // Mettre à jour toutes les 30 secondes
-  const interval = setInterval(updateStatusBar, 30000);
+  // Mettre à jour toutes les 10 secondes
+  const interval = setInterval(() => {
+    updateStatusBar();
+    // Aussi mettre à jour la sidebar
+    petWebviewProvider.refresh();
+  }, 10000);
 
   context.subscriptions.push(
     showPetCommand,
