@@ -68,7 +68,7 @@ export class Boy {
   }
 
   public addXP(amount: number): void {
-    this.data.xp += amount;
+    this.data.xp += amount * (1 + this.data.hunger / 100) * (1 + this.data.happiness / 100) * (1 + this.data.energy / 100);
     this.checkLevelUp();
     this.updateAnimationState();
   }
