@@ -76,7 +76,7 @@
     const xpText = document.getElementById("xpText");
     if (xpText) {
       const nextLevelXP = data.level * 100;
-      xpText.textContent = `${data.xp}/${nextLevelXP} XP`;
+      xpText.textContent = `${Math.floor(data.xp)}/${nextLevelXP} XP`;
     }
 
     // Mise à jour de la barre de progression XP
