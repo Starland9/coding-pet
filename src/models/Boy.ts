@@ -68,7 +68,7 @@ export class Boy {
   }
 
   public addXP(amount: number): void {
-    this.data.xp += amount;
+    this.data.xp += amount * (1 + this.data.hunger / 100) * (1 + this.data.happiness / 100) * (1 + this.data.energy / 100);
     this.checkLevelUp();
     this.updateAnimationState();
   }
@@ -80,8 +80,8 @@ export class Boy {
   }
 
   public play(): void {
+    this.data.energy = Math.round(Math.max(0, this.data.energy - 10 * (Math.min(100 - this.data.happiness, 20)) / 20));
     this.data.happiness = Math.round(Math.min(100, this.data.happiness + 20));
-    this.data.energy = Math.round(Math.max(0, this.data.energy - 10));
     this.setTemporaryState("happy", 3000);
   }
 
